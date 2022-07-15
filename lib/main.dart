@@ -5,8 +5,9 @@ import 'package:movies/pages/home_page.dart';
 
 void main() async {
   SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      systemNavigationBarColor: Colors.white,
+    SystemUiOverlayStyle(
+      systemNavigationBarColor: Colors.grey[100],
+      systemNavigationBarIconBrightness: Brightness.dark,
     ),
   );
 

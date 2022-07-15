@@ -32,61 +32,69 @@ class _FavoriteMoviesState extends State<FavoriteMovies> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'F A V O R I T O S',
           style: TextStyle(
-            color: Colors.white,
+            color: Colors.grey[900],
           ),
         ),
         titleSpacing: 0,
-        elevation: 2,
+        elevation: 0,
         centerTitle: true,
-        iconTheme: const IconThemeData(
-          color: Colors.white,
+        iconTheme: IconThemeData(color: Colors.grey[700]),
+        backgroundColor: Colors.grey[100],
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(Icons.arrow_back, size: 24),
         ),
       ),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: GridView.builder(
-          physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 30,
-          ),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 1 / 1.85,
-            mainAxisSpacing: 20,
-            crossAxisSpacing: 20,
-          ),
-          shrinkWrap: true,
-          itemCount: favoriteMovies.length,
-          itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  CupertinoPageRoute(
-                    builder: (context) => MovieDetails(
-                      listType: favoriteMovies[index]['listType'],
-                      movieId: favoriteMovies[index]['movieId'].toString(),
-                      title: favoriteMovies[index]['title'],
-                      imagePath: favoriteMovies[index]['imagePath'],
-                      verticalImage: favoriteMovies[index]['verticalImage'],
-                      voteAverage: '${favoriteMovies[index]['voteAverage']}',
-                      releaseDate: favoriteMovies[index]['releaseDate'],
-                      overview: favoriteMovies[index]['overview'],
+      backgroundColor: Colors.grey[100],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: GridView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 30,
+            ),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 1 / 1.85,
+              mainAxisSpacing: 20,
+              crossAxisSpacing: 20,
+            ),
+            shrinkWrap: true,
+            itemCount: favoriteMovies.length,
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    CupertinoPageRoute(
+                      builder: (context) => MovieDetails(
+                        listType: favoriteMovies[index]['listType'],
+                        movieId: favoriteMovies[index]['movieId'].toString(),
+                        title: favoriteMovies[index]['title'],
+                        imagePath: favoriteMovies[index]['imagePath'],
+                        verticalImage: favoriteMovies[index]['verticalImage'],
+                        voteAverage: '${favoriteMovies[index]['voteAverage']}',
+                        releaseDate: favoriteMovies[index]['releaseDate'],
+                        overview: favoriteMovies[index]['overview'],
+                      ),
                     ),
-                  ),
-                );
-              },
-              child: MovieCard(
-                title: favoriteMovies[index]['title'],
-                imagePath: favoriteMovies[index]['verticalImage'],
-                voteAverage: '${favoriteMovies[index]['voteAverage']}',
-              ),
-            );
-          },
+                  );
+                },
+                child: MovieCard(
+                  title: favoriteMovies[index]['title'],
+                  imagePath: favoriteMovies[index]['verticalImage'],
+                  voteAverage: '${favoriteMovies[index]['voteAverage']}',
+                ),
+              );
+            },
+          ),
         ),
       ),
     );

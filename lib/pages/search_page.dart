@@ -24,11 +24,7 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   int pageToLoad = 1;
-  String categorySelected = '';
   String listType = 'movie';
-  final TextEditingController _searchcontroller = TextEditingController();
-  final focus = FocusNode();
-  bool searchBarVisible = false;
 
   Future getSearch() async {
     var search = await get(Uri.parse(
@@ -40,57 +36,51 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: searchBarVisible
-            ? TextField(
-                focusNode: focus,
-                controller: _searchcontroller,
-                decoration: const InputDecoration(
-                  hintText: 'O que está procurando?',
-                  hintStyle: TextStyle(
-                    color: Colors.white,
-                  ),
-                  border: InputBorder.none,
-                ),
-                cursorColor: Colors.white,
-                style: const TextStyle(color: Colors.white),
-              )
-            : Text(
-                widget.query.toUpperCase(),
-                style: const TextStyle(
-                  color: Colors.white,
-                  letterSpacing: 2,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
+        title: Text(
+          widget.query.toUpperCase(),
+          style: TextStyle(
+            color: Colors.grey[900],
+            letterSpacing: 2,
+          ),
+          overflow: TextOverflow.ellipsis,
+        ),
         titleSpacing: 0,
-        elevation: 2,
+        elevation: 0,
         centerTitle: true,
-        iconTheme: const IconThemeData(
-          color: Colors.white,
+        iconTheme: IconThemeData(color: Colors.grey[700]),
+        backgroundColor: Colors.grey[100],
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(Icons.arrow_back, size: 24),
         ),
       ),
+      backgroundColor: Colors.grey[100],
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            child: Column(
-              children: [
-                FutureBuilder(
-                  future: getSearch(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    } else if (snapshot.connectionState ==
-                        ConnectionState.done) {
-                      if (snapshot.hasError) {
-                        setState(() {});
-                        return const Center(child: Text('Erro'));
-                      } else if (snapshot.hasData) {
-                        Map<String, dynamic> data =
-                            snapshot.data as Map<String, dynamic>;
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            children: [
+              FutureBuilder(
+                future: getSearch(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return SizedBox(
+                      height: MediaQuery.of(context).size.height - 200,
+                      child: const Center(child: CircularProgressIndicator()),
+                    );
+                  } else if (snapshot.connectionState == ConnectionState.done) {
+                    if (snapshot.hasError) {
+                      setState(() {});
+                      return const Center(child: Text('Erro'));
+                    } else if (snapshot.hasData) {
+                      Map<String, dynamic> data =
+                          snapshot.data as Map<String, dynamic>;
 
+                      if (data['total_results'] == 0) {
+                        return const Text('Nada foi encontrado!');
+                      } else {
                         return Column(
                           children: [
                             GridView.builder(
@@ -147,93 +137,97 @@ class _SearchPageState extends State<SearchPage> {
                             ),
 
                             // change pages
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 20),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(50),
-                                    child: Container(
-                                      color: pageToLoad - 1 > 0
-                                          ? Colors.grey[200]
-                                          : Colors.grey[100],
-                                      child: IconButton(
-                                        onPressed: () {
-                                          if (pageToLoad - 1 > 0) {
-                                            setState(() {
-                                              pageToLoad -= 1;
-                                            });
-                                          }
-                                        },
-                                        color: pageToLoad - 1 > 0
-                                            ? Colors.black
-                                            : Colors.grey[400],
-                                        splashColor: pageToLoad - 1 > 0
-                                            ? Colors.grey[300]
-                                            : Colors.transparent,
-                                        highlightColor: pageToLoad - 1 > 0
-                                            ? Colors.grey[300]
-                                            : Colors.transparent,
-                                        icon: const Icon(
-                                          Icons.chevron_left,
+                            data['total_pages'] > 1
+                                ? Padding(
+                                    padding: const EdgeInsets.only(bottom: 20),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(50),
+                                          child: Container(
+                                            color: pageToLoad - 1 > 0
+                                                ? Colors.grey[200]
+                                                : Colors.grey[100],
+                                            child: IconButton(
+                                              onPressed: () {
+                                                if (pageToLoad - 1 > 0) {
+                                                  setState(() {
+                                                    pageToLoad -= 1;
+                                                  });
+                                                }
+                                              },
+                                              color: pageToLoad - 1 > 0
+                                                  ? Colors.black
+                                                  : Colors.grey[400],
+                                              splashColor: pageToLoad - 1 > 0
+                                                  ? Colors.grey[300]
+                                                  : Colors.transparent,
+                                              highlightColor: pageToLoad - 1 > 0
+                                                  ? Colors.grey[300]
+                                                  : Colors.transparent,
+                                              icon: const Icon(
+                                                Icons.chevron_left,
+                                              ),
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                    ),
-                                  ),
-                                  Text('Página ${pageToLoad.toString()}'),
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(50),
-                                    child: Container(
-                                      color:
-                                          pageToLoad + 1 < data['total_pages']
-                                              ? Colors.grey[200]
-                                              : Colors.grey[100],
-                                      child: IconButton(
-                                        onPressed: () {
-                                          if (pageToLoad + 1 <
-                                              data['total_pages']) {
-                                            setState(() {
-                                              pageToLoad += 1;
-                                            });
-                                          }
-                                        },
-                                        color:
-                                            pageToLoad + 1 < data['total_pages']
-                                                ? Colors.black
-                                                : Colors.grey[400],
-                                        splashColor:
-                                            pageToLoad + 1 < data['total_pages']
-                                                ? Colors.grey[300]
-                                                : Colors.transparent,
-                                        highlightColor:
-                                            pageToLoad + 1 < data['total_pages']
-                                                ? Colors.grey[300]
-                                                : Colors.transparent,
-                                        icon: const Icon(
-                                          Icons.chevron_right,
+                                        Text('Página ${pageToLoad.toString()}'),
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(50),
+                                          child: Container(
+                                            color: pageToLoad + 1 <=
+                                                    data['total_pages']
+                                                ? Colors.grey[200]
+                                                : Colors.grey[100],
+                                            child: IconButton(
+                                              onPressed: () {
+                                                if (pageToLoad + 1 <=
+                                                    data['total_pages']) {
+                                                  setState(() {
+                                                    pageToLoad += 1;
+                                                  });
+                                                }
+                                              },
+                                              color: pageToLoad + 1 <=
+                                                      data['total_pages']
+                                                  ? Colors.black
+                                                  : Colors.grey[400],
+                                              splashColor: pageToLoad + 1 <=
+                                                      data['total_pages']
+                                                  ? Colors.grey[300]
+                                                  : Colors.transparent,
+                                              highlightColor: pageToLoad + 1 <=
+                                                      data['total_pages']
+                                                  ? Colors.grey[300]
+                                                  : Colors.transparent,
+                                              icon: const Icon(
+                                                Icons.chevron_right,
+                                              ),
+                                            ),
+                                          ),
                                         ),
-                                      ),
+                                      ],
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                                  )
+                                : const SizedBox(),
                           ],
                         );
-                      } else {
-                        setState(() {});
-                        return const Text('');
                       }
                     } else {
                       setState(() {});
                       return const Text('');
                     }
-                  },
-                ),
-              ],
-            ),
+                  } else {
+                    setState(() {});
+                    return const Text('');
+                  }
+                },
+              ),
+            ],
           ),
         ),
       ),

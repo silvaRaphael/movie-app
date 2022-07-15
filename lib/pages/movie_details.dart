@@ -54,6 +54,9 @@ class _MovieDetailsState extends State<MovieDetails> {
     getSimilarMovies();
     setState(() {
       movieIsFavorite = checkIfMovieIsFavorite();
+      if (widget.imagePath.runtimeType != Null) {
+        moviePosters.add(widget.imagePath);
+      }
     });
   }
 
@@ -157,8 +160,8 @@ class _MovieDetailsState extends State<MovieDetails> {
         title: Text(
           widget.title,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: Colors.grey[900],
           ),
         ),
         actions: [
@@ -176,19 +179,27 @@ class _MovieDetailsState extends State<MovieDetails> {
           ),
         ],
         titleSpacing: 0,
-        elevation: 2,
+        elevation: 0,
         centerTitle: true,
-        iconTheme: const IconThemeData(
-          color: Colors.white,
+        iconTheme: IconThemeData(
+          color: Colors.grey[700],
+        ),
+        backgroundColor: Colors.grey[100],
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(Icons.arrow_back, size: 24),
         ),
       ),
+      backgroundColor: Colors.grey[100],
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              moviePosters.isNotEmpty || widget.imagePath.runtimeType != Null
+              moviePosters.isNotEmpty
                   ? AspectRatio(
                       aspectRatio: 2 / 1.1,
                       child: NotificationListener(
@@ -197,25 +208,18 @@ class _MovieDetailsState extends State<MovieDetails> {
                           notification.disallowIndicator();
                           return false;
                         },
-                        child: moviePosters.isNotEmpty
-                            ? PageView(
-                                children: [
-                                  ...moviePosters
-                                      .map(
-                                        (item) => Image.network(
-                                          'https://image.tmdb.org/t/p/w500$item',
-                                          fit: BoxFit.cover,
-                                        ),
-                                      )
-                                      .toList(),
-                                ],
-                              )
-                            : widget.imagePath.runtimeType != Null
-                                ? Image.network(
-                                    'https://image.tmdb.org/t/p/w500${widget.imagePath}',
+                        child: PageView(
+                          children: [
+                            ...moviePosters
+                                .map(
+                                  (item) => Image.network(
+                                    'https://image.tmdb.org/t/p/w500$item',
                                     fit: BoxFit.cover,
-                                  )
-                                : const SizedBox(),
+                                  ),
+                                )
+                                .toList(),
+                          ],
+                        ),
                       ),
                     )
                   : const SizedBox(),

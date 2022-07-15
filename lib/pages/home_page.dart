@@ -26,13 +26,13 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: SizedBox(
         height: 48,
         child: BottomNavigationBar(
+          backgroundColor: Colors.grey[100],
           currentIndex: tabIndex,
           onTap: (int index) {
             setState(() {
               tabIndex = index;
             });
           },
-          elevation: 2,
           selectedItemColor: Colors.black,
           selectedIconTheme: const IconThemeData(
             color: Colors.black,

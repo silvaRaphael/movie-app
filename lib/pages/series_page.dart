@@ -101,23 +101,22 @@ class _SeriesPageState extends State<SeriesPage> {
                 onFieldSubmitted: (value) {
                   searchMovie();
                 },
-                // focusNode: focus,
                 autofocus: true,
                 controller: _searchcontroller,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: 'O que está procurando?',
                   hintStyle: TextStyle(
-                    color: Colors.white,
+                    color: Colors.grey[700],
                   ),
                   border: InputBorder.none,
                 ),
-                cursorColor: Colors.white,
-                style: const TextStyle(color: Colors.white),
+                cursorColor: Colors.grey[700],
+                style: TextStyle(color: Colors.grey[700]),
               )
-            : const Text(
+            : Text(
                 'S É R I E S',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Colors.grey[900],
                 ),
               ),
         leading: GestureDetector(
@@ -156,10 +155,12 @@ class _SeriesPageState extends State<SeriesPage> {
           ),
         ],
         titleSpacing: 0,
-        elevation: 2,
+        elevation: 0,
         centerTitle: true,
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: Colors.grey[700]),
+        backgroundColor: Colors.grey[100],
       ),
+      backgroundColor: Colors.grey[100],
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -255,13 +256,26 @@ class _SeriesPageState extends State<SeriesPage> {
               // serie list
               seriesList.isNotEmpty
                   ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // section title
+                        categorySelected == ''
+                            ? const Padding(
+                                padding: EdgeInsets.all(20),
+                                child: Text(
+                                  'Populares',
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              )
+                            : const SizedBox(height: 30),
+
+                        // movies grid
                         GridView.builder(
                           physics: const NeverScrollableScrollPhysics(),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 30,
-                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
@@ -308,75 +322,80 @@ class _SeriesPageState extends State<SeriesPage> {
                         ),
 
                         // change pages
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 20),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(50),
-                                child: Container(
-                                  color: pageToLoad - 1 > 0
-                                      ? Colors.grey[200]
-                                      : Colors.grey[100],
-                                  child: IconButton(
-                                    onPressed: () {
-                                      if (pageToLoad - 1 > 0) {
-                                        setState(() {
-                                          pageToLoad -= 1;
-                                          getSeries();
-                                        });
-                                      }
-                                    },
-                                    color: pageToLoad - 1 > 0
-                                        ? Colors.black
-                                        : Colors.grey[400],
-                                    splashColor: pageToLoad - 1 > 0
-                                        ? Colors.grey[300]
-                                        : Colors.transparent,
-                                    highlightColor: pageToLoad - 1 > 0
-                                        ? Colors.grey[300]
-                                        : Colors.transparent,
-                                    icon: const Icon(
-                                      Icons.chevron_left,
+                        totalPages > 1
+                            ? Padding(
+                                padding: const EdgeInsets.only(bottom: 20),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(50),
+                                      child: Container(
+                                        color: pageToLoad - 1 > 0
+                                            ? Colors.grey[200]
+                                            : Colors.grey[100],
+                                        child: IconButton(
+                                          onPressed: () {
+                                            if (pageToLoad - 1 > 0) {
+                                              setState(() {
+                                                pageToLoad -= 1;
+                                                getSeries();
+                                              });
+                                            }
+                                          },
+                                          color: pageToLoad - 1 > 0
+                                              ? Colors.black
+                                              : Colors.grey[400],
+                                          splashColor: pageToLoad - 1 > 0
+                                              ? Colors.grey[300]
+                                              : Colors.transparent,
+                                          highlightColor: pageToLoad - 1 > 0
+                                              ? Colors.grey[300]
+                                              : Colors.transparent,
+                                          icon: const Icon(
+                                            Icons.chevron_left,
+                                          ),
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
-                              ),
-                              Text('Página ${pageToLoad.toString()}'),
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(50),
-                                child: Container(
-                                  color: pageToLoad + 1 < totalPages
-                                      ? Colors.grey[200]
-                                      : Colors.grey[100],
-                                  child: IconButton(
-                                    onPressed: () {
-                                      if (pageToLoad + 1 < totalPages) {
-                                        setState(() {
-                                          pageToLoad += 1;
-                                          getSeries();
-                                        });
-                                      }
-                                    },
-                                    color: pageToLoad + 1 < totalPages
-                                        ? Colors.black
-                                        : Colors.grey[400],
-                                    splashColor: pageToLoad + 1 < totalPages
-                                        ? Colors.grey[300]
-                                        : Colors.transparent,
-                                    highlightColor: pageToLoad + 1 < totalPages
-                                        ? Colors.grey[300]
-                                        : Colors.transparent,
-                                    icon: const Icon(
-                                      Icons.chevron_right,
+                                    Text('Página ${pageToLoad.toString()}'),
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(50),
+                                      child: Container(
+                                        color: pageToLoad + 1 <= totalPages
+                                            ? Colors.grey[200]
+                                            : Colors.grey[100],
+                                        child: IconButton(
+                                          onPressed: () {
+                                            if (pageToLoad + 1 <= totalPages) {
+                                              setState(() {
+                                                pageToLoad += 1;
+                                                getSeries();
+                                              });
+                                            }
+                                          },
+                                          color: pageToLoad + 1 <= totalPages
+                                              ? Colors.black
+                                              : Colors.grey[400],
+                                          splashColor:
+                                              pageToLoad + 1 <= totalPages
+                                                  ? Colors.grey[300]
+                                                  : Colors.transparent,
+                                          highlightColor:
+                                              pageToLoad + 1 <= totalPages
+                                                  ? Colors.grey[300]
+                                                  : Colors.transparent,
+                                          icon: const Icon(
+                                            Icons.chevron_right,
+                                          ),
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                  ],
                                 ),
-                              ),
-                            ],
-                          ),
-                        ),
+                              )
+                            : const SizedBox(),
                       ],
                     )
                   : SizedBox(
