@@ -18,7 +18,7 @@ class MovieCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
-      aspectRatio: 1 / 1.85,
+      aspectRatio: 1 / 1.77,
       child: Container(
         decoration: const BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -46,20 +46,14 @@ class MovieCard extends StatelessWidget {
                   children: [
                     Container(
                       decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                            begin: Alignment.topRight,
-                            end: Alignment.bottomLeft,
-                            colors: [
-                              Colors.black,
-                              Colors.black12,
-                            ]),
+                        color: Color(0x68111111),
                         borderRadius: BorderRadius.only(
                           topRight: Radius.circular(10),
-                          bottomLeft: Radius.circular(10),
+                          bottomLeft: Radius.circular(6),
                         ),
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(6),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -67,12 +61,14 @@ class MovieCard extends StatelessWidget {
                               double.parse(voteAverage).toStringAsFixed(1),
                               style: const TextStyle(
                                 color: Colors.white,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
+                            const SizedBox(width: 2),
                             const Icon(
-                              Icons.star_outline,
+                              Icons.star,
                               color: Colors.white,
-                              size: 14,
+                              size: 16,
                             ),
                           ],
                         ),
@@ -82,17 +78,17 @@ class MovieCard extends StatelessWidget {
                 ),
               ],
             ),
-            Padding(
-              padding: const EdgeInsets.only(top: 15),
-              child: Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 12,
-                ),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 2,
-              ),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.only(top: 15),
+            //   child: Text(
+            //     title,
+            //     style: const TextStyle(
+            //       fontSize: 12,
+            //     ),
+            //     overflow: TextOverflow.ellipsis,
+            //     maxLines: 2,
+            //   ),
+            // ),
           ],
         ),
       ),

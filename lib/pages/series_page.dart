@@ -4,10 +4,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:movies/constants/api_key.dart';
+import 'package:movies/pages/category_movies.dart';
 import 'package:movies/pages/favorites_page.dart';
 import 'package:movies/pages/movie_details.dart';
 import 'package:movies/pages/search_page.dart';
 import 'package:movies/utils/movie_card.dart';
+import 'package:movies/utils/shadow_button.dart';
 
 class SeriesPage extends StatefulWidget {
   const SeriesPage({Key? key}) : super(key: key);
@@ -17,40 +19,27 @@ class SeriesPage extends StatefulWidget {
 }
 
 class _SeriesPageState extends State<SeriesPage> {
-  int pageToLoad = 1;
   String categorySelected = '';
   String listType = 'tv';
   List categoriesList = [];
-  List seriesList = [];
-  int totalPages = 0;
-
-  final TextEditingController _searchcontroller = TextEditingController();
-  final focus = FocusNode();
-  bool searchBarVisible = false;
-
-  final ScrollController _serieCategoryController =
-      ScrollController(keepScrollOffset: true);
+  List moviesList = [];
+  List popularMovie = [];
 
   @override
   void initState() {
+    getPopularMovie();
     getCategories();
-    getSeries();
     super.initState();
   }
 
-  Future getSeries() async {
-    seriesList = [];
+  Future getPopularMovie() async {
+    var movies = await get(Uri.parse(
+        'https://api.themoviedb.org/3/$listType/popular?api_key=$apiKey&language=pt-BR&page=1&region=BR'));
 
-    var series = await get(Uri.parse(
-        'https://api.themoviedb.org/3/discover/$listType?api_key=$apiKey&language=pt-BR&with_genres=$categorySelected&page=${pageToLoad.toString()}'));
-
-    Map<String, dynamic> res = jsonDecode(series.body) as Map<String, dynamic>;
+    Map<String, dynamic> res = jsonDecode(movies.body) as Map<String, dynamic>;
 
     setState(() {
-      res['results'].forEach((element) {
-        seriesList.add(element);
-      });
-      totalPages = res['total_pages'];
+      popularMovie.add(res['results'][0]);
     });
   }
 
@@ -63,31 +52,33 @@ class _SeriesPageState extends State<SeriesPage> {
     Map<String, dynamic> res =
         jsonDecode(categories.body) as Map<String, dynamic>;
 
-    setState(() {
-      res['genres'].forEach((element) {
+    res['genres'].forEach((element) {
+      setState(() {
         categoriesList.add(element);
       });
     });
+    getMoviesByCategory();
   }
 
-  void searchMovie() {
-    if (searchBarVisible) {
-      if (_searchcontroller.text.trim().isNotEmpty) {
-        Navigator.push(
-          context,
-          CupertinoPageRoute(
-            builder: (context) => SearchPage(
-              query: _searchcontroller.text.trim(),
-              listType: 'movie',
-            ),
-          ),
-        );
-        searchBarVisible = false;
-      }
-    } else {
+  Future getMoviesByCategory() async {
+    moviesList = [];
+    List moviesByCategory = [];
+
+    for (var element in categoriesList) {
+      var movies = await get(Uri.parse(
+          'https://api.themoviedb.org/3/discover/$listType?api_key=$apiKey&language=pt-BR&with_genres=${element['id']}'));
+
+      Map<String, dynamic> res =
+          jsonDecode(movies.body) as Map<String, dynamic>;
+
       setState(() {
-        _searchcontroller.clear();
-        searchBarVisible = true;
+        moviesByCategory = [];
+        for (var element in res['results']) {
+          moviesByCategory.add(element);
+          if (moviesByCategory.length == categoriesList.length) {
+            moviesList.add(moviesByCategory);
+          }
+        }
       });
     }
   }
@@ -95,318 +86,207 @@ class _SeriesPageState extends State<SeriesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: searchBarVisible
-            ? TextFormField(
-                onFieldSubmitted: (value) {
-                  searchMovie();
-                },
-                autofocus: true,
-                controller: _searchcontroller,
-                decoration: InputDecoration(
-                  hintText: 'O que está procurando?',
-                  hintStyle: TextStyle(
-                    color: Colors.grey[700],
-                  ),
-                  border: InputBorder.none,
-                ),
-                cursorColor: Colors.grey[700],
-                style: TextStyle(color: Colors.grey[700]),
-              )
-            : Text(
-                'S É R I E S',
-                style: TextStyle(
-                  color: Colors.grey[900],
-                ),
-              ),
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              CupertinoPageRoute(builder: (context) => const FavoriteMovies()),
-            );
-          },
-          child: const Icon(Icons.favorite_border),
-        ),
-        actions: [
-          searchBarVisible
-              ? Padding(
-                  padding: const EdgeInsets.only(right: 10, left: 10),
-                  child: GestureDetector(
+      backgroundColor: const Color(0xff111111),
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          SliverAppBar(
+            pinned: true,
+            backgroundColor: const Color(0xA9111111),
+            expandedHeight: MediaQuery.of(context).size.width * 1.45,
+            collapsedHeight: 90,
+            toolbarHeight: 90,
+            leadingWidth: 0,
+            leading: const SizedBox.shrink(),
+            title: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ShadowButton(
+                    color: const Color(0xff111111),
+                    icon: Icons.favorite_border,
                     onTap: () {
-                      _searchcontroller.clear();
-                      setState(() {
-                        searchBarVisible = false;
-                      });
+                      Navigator.push(
+                        context,
+                        CupertinoPageRoute(
+                          builder: (context) => const FavoriteMovies(),
+                        ),
+                      );
                     },
-                    child: const Icon(Icons.close),
                   ),
-                )
-              : const SizedBox(),
-          Padding(
-            padding: const EdgeInsets.only(right: 20, left: 15),
-            child: GestureDetector(
-              onTap: () {
-                searchMovie();
-                FocusScope.of(context).requestFocus(focus);
+                  ShadowButton(
+                    color: const Color(0xff111111),
+                    icon: Icons.search,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        CupertinoPageRoute(
+                          builder: (context) => SearchPage(
+                            listType: listType,
+                            categoriesList: categoriesList,
+                            defaultList: moviesList[0],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+            flexibleSpace: FlexibleSpaceBar(
+              background: popularMovie.isNotEmpty
+                  ? Image.network(
+                      'https://image.tmdb.org/t/p/w500${popularMovie[0]['poster_path']}',
+                      fit: BoxFit.cover,
+                    )
+                  : const SizedBox(),
+              title: GestureDetector(
+                onTap: () {
+                  FocusScope.of(context).unfocus();
+                  Navigator.push(
+                    context,
+                    CupertinoPageRoute(
+                      builder: (context) => MovieDetails(
+                        listType: listType,
+                        movieId: popularMovie[0]['id'].toString(),
+                        title: popularMovie[0]['name'],
+                        imagePath: popularMovie[0]['backdrop_path'],
+                        verticalImage: popularMovie[0]['poster_path'],
+                        voteAverage: '${popularMovie[0]['vote_average']}',
+                        releaseDate: popularMovie[0]['first_air_date'],
+                        overview: popularMovie[0]['overview'],
+                      ),
+                    ),
+                  );
+                },
+              ),
+              centerTitle: true,
+            ),
+          ),
+
+          // home content
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              childCount: categoriesList.length,
+              (context, categoryIndex) {
+                if (moviesList.isEmpty || moviesList.runtimeType == Null) {
+                  return const SizedBox();
+                }
+                if (moviesList.length > categoryIndex) {
+                  return Padding(
+                    padding: categoryIndex == 0
+                        ? const EdgeInsets.only(top: 50)
+                        : const EdgeInsets.only(top: 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 30),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                categoriesList[categoryIndex]['name'],
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w500,
+                                  fontFamily: 'Montserrat',
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    CupertinoPageRoute(
+                                      builder: (context) => CategoryMovies(
+                                        categoryId:
+                                            categoriesList[categoryIndex]['id']
+                                                .toString(),
+                                        categoryName:
+                                            categoriesList[categoryIndex]
+                                                ['name'],
+                                        listType: listType,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: const Icon(
+                                  Icons.add_circle_outline,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          height: 250,
+                          child: ListView.builder(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            physics: const BouncingScrollPhysics(),
+                            shrinkWrap: true,
+                            scrollDirection: Axis.horizontal,
+                            itemCount: 10,
+                            itemBuilder: (context, index) {
+                              return GestureDetector(
+                                onTap: () {
+                                  FocusScope.of(context).unfocus();
+                                  Navigator.push(
+                                    context,
+                                    CupertinoPageRoute(
+                                      builder: (context) => MovieDetails(
+                                        listType: listType,
+                                        movieId: moviesList[categoryIndex]
+                                                [index]['id']
+                                            .toString(),
+                                        title: moviesList[categoryIndex][index]
+                                            ['name'],
+                                        imagePath: moviesList[categoryIndex]
+                                            [index]['backdrop_path'],
+                                        verticalImage: moviesList[categoryIndex]
+                                            [index]['poster_path'],
+                                        voteAverage:
+                                            '${moviesList[categoryIndex][index]['vote_average']}',
+                                        releaseDate: moviesList[categoryIndex]
+                                            [index]['first_air_date'],
+                                        overview: moviesList[categoryIndex]
+                                            [index]['overview'],
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10),
+                                  child: MovieCard(
+                                    title: moviesList[categoryIndex][index]
+                                        ['name'],
+                                    imagePath: moviesList[categoryIndex][index]
+                                        ['poster_path'],
+                                    voteAverage:
+                                        '${moviesList[categoryIndex][index]['vote_average']}',
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                } else if (moviesList.length == categoryIndex) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                return null;
               },
-              child: const Icon(Icons.search),
             ),
           ),
         ],
-        titleSpacing: 0,
-        elevation: 0,
-        centerTitle: true,
-        iconTheme: IconThemeData(color: Colors.grey[700]),
-        backgroundColor: Colors.grey[100],
-      ),
-      backgroundColor: Colors.grey[100],
-      body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            children: [
-              // categorie list
-              categoriesList.isNotEmpty
-                  ? Container(
-                      height: 40,
-                      margin: const EdgeInsets.only(top: 20),
-                      child: ListView.builder(
-                        key: const PageStorageKey('SeriesCategoryKey'),
-                        controller: _serieCategoryController,
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        physics: const BouncingScrollPhysics(),
-                        scrollDirection: Axis.horizontal,
-                        itemCount: categoriesList.length + 1,
-                        itemBuilder: (context, index) {
-                          if (index == 0) {
-                            return GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  categorySelected = '';
-                                  pageToLoad = 1;
-                                  getSeries();
-                                });
-                              },
-                              child: Container(
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 5),
-                                decoration: BoxDecoration(
-                                  color: categorySelected == ''
-                                      ? Colors.grey[500]
-                                      : Colors.grey[300],
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 12),
-                                  child: Text(
-                                    'Todos',
-                                    style: TextStyle(
-                                      color: categorySelected == ''
-                                          ? Colors.white
-                                          : Colors.black,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          }
-
-                          return GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                categorySelected =
-                                    categoriesList[index - 1]['id'].toString();
-                                pageToLoad = 1;
-                                getSeries();
-                              });
-                            },
-                            child: Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 5),
-                              decoration: BoxDecoration(
-                                color: categorySelected ==
-                                        categoriesList[index - 1]['id']
-                                            .toString()
-                                    ? Colors.grey[500]
-                                    : Colors.grey[300],
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 20, vertical: 12),
-                                child: Text(
-                                  categoriesList[index - 1]['name'],
-                                  style: TextStyle(
-                                    color: categorySelected ==
-                                            categoriesList[index - 1]['id']
-                                                .toString()
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    )
-                  : const SizedBox(),
-
-              // serie list
-              seriesList.isNotEmpty
-                  ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // section title
-                        categorySelected == ''
-                            ? const Padding(
-                                padding: EdgeInsets.all(20),
-                                child: Text(
-                                  'Populares',
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              )
-                            : const SizedBox(height: 30),
-
-                        // movies grid
-                        GridView.builder(
-                          physics: const NeverScrollableScrollPhysics(),
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio: 1 / 1.85,
-                            mainAxisSpacing: 20,
-                            crossAxisSpacing: 20,
-                          ),
-                          shrinkWrap: true,
-                          itemCount: seriesList.length,
-                          itemBuilder: (context, index) {
-                            return GestureDetector(
-                              onTap: () {
-                                FocusScope.of(context).unfocus();
-                                Navigator.push(
-                                  context,
-                                  CupertinoPageRoute(
-                                    builder: (context) => MovieDetails(
-                                      listType: listType,
-                                      movieId:
-                                          seriesList[index]['id'].toString(),
-                                      title: seriesList[index]['name'],
-                                      imagePath: seriesList[index]
-                                          ['backdrop_path'],
-                                      verticalImage: seriesList[index]
-                                          ['poster_path'],
-                                      voteAverage: seriesList[index]
-                                              ['vote_average']
-                                          .toString(),
-                                      releaseDate: seriesList[index]
-                                          ['first_air_date'],
-                                      overview: seriesList[index]['overview'],
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: MovieCard(
-                                title: seriesList[index]['name'],
-                                imagePath: seriesList[index]['poster_path'],
-                                voteAverage: seriesList[index]['vote_average']
-                                    .toString(),
-                              ),
-                            );
-                          },
-                        ),
-
-                        // change pages
-                        totalPages > 1
-                            ? Padding(
-                                padding: const EdgeInsets.only(bottom: 20),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(50),
-                                      child: Container(
-                                        color: pageToLoad - 1 > 0
-                                            ? Colors.grey[200]
-                                            : Colors.grey[100],
-                                        child: IconButton(
-                                          onPressed: () {
-                                            if (pageToLoad - 1 > 0) {
-                                              setState(() {
-                                                pageToLoad -= 1;
-                                                getSeries();
-                                              });
-                                            }
-                                          },
-                                          color: pageToLoad - 1 > 0
-                                              ? Colors.black
-                                              : Colors.grey[400],
-                                          splashColor: pageToLoad - 1 > 0
-                                              ? Colors.grey[300]
-                                              : Colors.transparent,
-                                          highlightColor: pageToLoad - 1 > 0
-                                              ? Colors.grey[300]
-                                              : Colors.transparent,
-                                          icon: const Icon(
-                                            Icons.chevron_left,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Text('Página ${pageToLoad.toString()}'),
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(50),
-                                      child: Container(
-                                        color: pageToLoad + 1 <= totalPages
-                                            ? Colors.grey[200]
-                                            : Colors.grey[100],
-                                        child: IconButton(
-                                          onPressed: () {
-                                            if (pageToLoad + 1 <= totalPages) {
-                                              setState(() {
-                                                pageToLoad += 1;
-                                                getSeries();
-                                              });
-                                            }
-                                          },
-                                          color: pageToLoad + 1 <= totalPages
-                                              ? Colors.black
-                                              : Colors.grey[400],
-                                          splashColor:
-                                              pageToLoad + 1 <= totalPages
-                                                  ? Colors.grey[300]
-                                                  : Colors.transparent,
-                                          highlightColor:
-                                              pageToLoad + 1 <= totalPages
-                                                  ? Colors.grey[300]
-                                                  : Colors.transparent,
-                                          icon: const Icon(
-                                            Icons.chevron_right,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : const SizedBox(),
-                      ],
-                    )
-                  : SizedBox(
-                      height: MediaQuery.of(context).size.height - 200,
-                      child: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    ),
-            ],
-          ),
-        ),
       ),
     );
   }

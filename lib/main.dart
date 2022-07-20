@@ -5,9 +5,10 @@ import 'package:movies/pages/home_page.dart';
 
 void main() async {
   SystemChrome.setSystemUIOverlayStyle(
-    SystemUiOverlayStyle(
-      systemNavigationBarColor: Colors.grey[100],
-      systemNavigationBarIconBrightness: Brightness.dark,
+    const SystemUiOverlayStyle(
+      systemNavigationBarColor: Color(0xE1111111),
+      systemNavigationBarIconBrightness: Brightness.light,
+      statusBarBrightness: Brightness.light,
     ),
   );
 
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.grey,
+        brightness: Brightness.dark,
       ),
       home: const HomePage(),
     );

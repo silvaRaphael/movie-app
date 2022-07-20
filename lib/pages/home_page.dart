@@ -24,35 +24,25 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: pages[tabIndex],
       bottomNavigationBar: SizedBox(
-        height: 48,
+        height: 50,
         child: BottomNavigationBar(
-          backgroundColor: Colors.grey[100],
+          backgroundColor: const Color(0xAB111111),
           currentIndex: tabIndex,
           onTap: (int index) {
             setState(() {
               tabIndex = index;
             });
           },
-          selectedItemColor: Colors.black,
-          selectedIconTheme: const IconThemeData(
-            color: Colors.black,
-          ),
-          unselectedIconTheme: IconThemeData(
-            color: Colors.grey[400],
-          ),
-          iconSize: 18,
-          selectedFontSize: 12,
+          selectedItemColor: Colors.white,
+          unselectedItemColor: Colors.white60,
+          selectedFontSize: 14,
           items: const [
             BottomNavigationBarItem(
-              icon: Icon(
-                Icons.tv,
-              ),
+              icon: SizedBox.shrink(),
               label: 'Filmes',
             ),
             BottomNavigationBarItem(
-              icon: Icon(
-                Icons.computer,
-              ),
+              icon: SizedBox.shrink(),
               label: 'Séries',
             ),
           ],
