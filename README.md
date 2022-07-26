@@ -1,5 +1,5 @@
 # movies
 
-![home](https://github.com/silvaRaphael/bigapp/blob/main/assets/images/movie-app-home.png?raw=true)
+<img src="https://github.com/silvaRaphael/bigapp/blob/main/assets/images/movie-app-home.png?raw=true" width="380px">
 
-![detais](https://github.com/silvaRaphael/bigapp/blob/main/assets/images/movie-app-details.png?raw=true)
+<img src="https://github.com/silvaRaphael/bigapp/blob/main/assets/images/movie-app-details.png?raw=true" width="380px">
