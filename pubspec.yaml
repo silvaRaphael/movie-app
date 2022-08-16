@@ -43,6 +43,7 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   dots_indicator: ^2.1.0
+  connectivity_plus: ^2.3.6
   
 
 dev_dependencies:
