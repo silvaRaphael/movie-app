@@ -3,7 +3,7 @@
 ## App Images
 
 
-<div style="display:flex";
+<div style="display:flex">
   <img
     src="/home-removebg-preview.png"
     style="max-width: 300px">
