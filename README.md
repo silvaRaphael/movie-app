@@ -2,11 +2,11 @@
 
 ## App Images
 
-<p style="display:flex; flex-wrap: wrap; background: red;">
-  
   <img
     src="/home-removebg-preview.png"
-    style="max-width: 300px">
+    style="display: inline-block; margin: 0 auto; max-width: 300px">
+
+  ![](/detalhes-1-removebg-preview.png)
 
   <img
     src="/detalhes-1-removebg-preview.png"
@@ -28,4 +28,3 @@
     src="/favoritos-removebg-preview.png"
     style="max-width: 300px">
 
-</p>
