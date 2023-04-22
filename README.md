@@ -9,11 +9,11 @@
 
 <div style="display:flex;">
   <img
-    src="/home-removebg-preview.png"
+    src="https://raw.githubusercontent.com/silvaRaphael/movie-app/home-removebg-preview.png"
     width="300px">
 
   <img
-    src="/detalhes-1-removebg-preview.png"
+    src="https://raw.githubusercontent.com/silvaRaphael/movie-app/detalhes-1-removebg-preview.png"
     width="300px">
 
   
