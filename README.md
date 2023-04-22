@@ -2,7 +2,7 @@
 
 ## App Images
 
-<div style="display:flex; flex-wrap: wrap; background: red;">
+<p style="display:flex; flex-wrap: wrap; background: red;">
   
   <img
     src="/home-removebg-preview.png"
@@ -28,4 +28,4 @@
     src="/favoritos-removebg-preview.png"
     style="max-width: 300px">
 
-</div>
+</p>
