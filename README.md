@@ -4,9 +4,7 @@
 
   <img
     src="/home-removebg-preview.png"
-    style="display: inline-block; margin: 0 auto; max-width: 300px">
-
-  ![](/detalhes-1-removebg-preview.png)
+    style="max-width: 300px">
 
   <img
     src="/detalhes-1-removebg-preview.png"
@@ -27,4 +25,3 @@
   <img
     src="/favoritos-removebg-preview.png"
     style="max-width: 300px">
-
